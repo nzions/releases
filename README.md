@@ -1,41 +1,46 @@
 # releases
 
-Build and release binaries from source repos using `go build`.
+Static Go binaries for various tools.
 
-## Install Binaries
+## Install
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/nzions/releases/master/get.sh | bash
 ```
 
-This auto-detects your OS/architecture and installs the latest versions to `~/bin`.
+Auto-detects your OS/architecture and installs to `~/go/bin` or `/usr/local/bin`.
 
-## Build New Releases
+## Tools
+
+- **certmania** - Certificate management utility
+- **simplecrypt** - Simple encryption/decryption tool
+
+---
+
+<details>
+<summary>For maintainers: Building releases</summary>
+
+### Build New Releases
 
 ```bash
-./release.sh
+bash release.sh
 ```
 
-Builds all binaries listed in `.binaries` for all platforms, creates git tags, commits, and pushes.
+Builds all binaries from `.binaries`, creates git tags, commits, and pushes.
 
-## Configuration
+### Configuration
 
-Edit `.binaries` (one per line, format: `path` or `path:appname`):
+Edit `.binaries` (format: `path:appname`):
 
 ```
 ~/code/coreutils/certmania/cli:certmania
 ~/code/coreutils/simplecrypt/cli:simplecrypt
 ```
 
-If no appname specified, uses the directory name.
+### Platforms
 
-## Requirements
+linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
 
-- Go installed
-- Each binary supports `go run . --version`
+Binaries are static (CGO_ENABLED=0, -tags netgo) and stripped (-ldflags="-s -w").
 
-## Output
-
-Binaries go to `binaries/<name>/<os>-<arch>-v<version>`
-
-Platforms built: linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
+</details>
