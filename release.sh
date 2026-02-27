@@ -55,6 +55,12 @@ for entry in "${BINARIES[@]}"; do
     
     log "    version: $version"
     
+    # Get git commit hash from source repo
+    git_commit=$(cd "$mod_dir" && git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+    build_date=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+    releaser_url="https://github.com/nzions/releases"
+    license="Copyright (c) 2026 nzions. All rights reserved. Private and proprietary software. Use requires permission."
+    
     # Create output directory
     dest_dir="$RELEASES_REPO/binaries/$binary_name"
     mkdir -p "$dest_dir"
@@ -71,13 +77,12 @@ for entry in "${BINARIES[@]}"; do
         target_name="$output_os-$arch-$version"
         target_path="$dest_dir/$target_name"
         
-        # Add .exe for windows
-        binary_path_build="$rel_path"
-        [ "$os" = "windows" ] && binary_path_build="$rel_path.exe"
-        
-        # Build
+        # Build with injected variables
         cd "$mod_dir"
-        CGO_ENABLED=0 GOOS="$os" GOARCH="$arch" go build -tags netgo -ldflags="-s -w" -o "$target_path" "./$rel_path" 2>/dev/null || continue
+        CGO_ENABLED=0 GOOS="$os" GOARCH="$arch" go build \
+            -tags netgo \
+            -ldflags="-s -w -X main.Version=$version -X main.GitCommit=$git_commit -X main.BuildDate=$build_date -X main.ReleaserURL=$releaser_url -X main.License=$license" \
+            -o "$target_path" "./$rel_path" 2>/dev/null || continue
         chmod +x "$target_path"
     done
     

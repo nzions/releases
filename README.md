@@ -43,4 +43,15 @@ linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
 
 Binaries are static (CGO_ENABLED=0, -tags netgo) and stripped (-ldflags="-s -w").
 
+### Injected Build Variables
+
+The following variables are automatically injected at build time:
+- `main.Version` - Binary version
+- `main.GitCommit` - Source commit hash
+- `main.BuildDate` - Build timestamp (RFC3339 UTC)
+- `main.ReleaserURL` - https://github.com/nzions/releases
+- `main.License` - License notice
+
+See [BUILD_VARS.md](BUILD_VARS.md) for implementation example.
+
 </details>
