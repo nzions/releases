@@ -140,12 +140,14 @@ if [ ${#RELEASED[@]} -gt 0 ]; then
     git add -f -A
     git commit --no-verify -m "$msg"
 
-    # Create tags and push
+    # Create annotated tags and push
     for rel in "${RELEASED[@]}"; do
-        git tag -f "${rel/:/-}"
+        tag_name="${rel/:/-}"
+        git tag -a -f "$tag_name" -m "Release ${rel%:*} ${rel#*:}"
     done
 
-    git push --follow-tags
+    git push
+    git push --tags
 
     log "✓ Done: $msg"
 fi
