@@ -11,7 +11,6 @@ find_install_dir() {
     # Preferred locations in order
     local candidates=(
         "$HOME/go/bin"
-        "/opt/homebrew/bin"
         "/usr/local/bin"
         "$HOME/bin"
         "$HOME/.local/bin"
