@@ -8,23 +8,22 @@ REPO="nzions/releases"
 
 # Find best install directory from PATH
 find_install_dir() {
-    # Preferred locations in order
+    # Only use these supported locations
     local candidates=(
         "$HOME/go/bin"
         "/usr/local/bin"
-        "$HOME/bin"
-        "$HOME/.local/bin"
+        "./"
     )
     
+    # First, check if any are already in PATH
     for dir in "${candidates[@]}"; do
-        # Check if directory is in PATH
         if echo "$PATH" | tr ':' '\n' | grep -q "^${dir}$"; then
             echo "$dir"
             return
         fi
     done
     
-    # Fallback: use first writable candidate
+    # Otherwise, use first writable one
     for dir in "${candidates[@]}"; do
         if [ -w "$dir" ] || [ -w "$(dirname "$dir")" ]; then
             echo "$dir"
@@ -32,8 +31,10 @@ find_install_dir() {
         fi
     done
     
-    # Last resort
-    echo "$HOME/bin"
+    # None available
+    echo "Error: No supported install location available" >&2
+    echo "Supported: ~/go/bin, /usr/local/bin, ./" >&2
+    exit 1
 }
 
 INSTALL_DIR=$(find_install_dir)
