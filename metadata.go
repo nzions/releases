@@ -2,38 +2,20 @@ package releases
 
 import "fmt"
 
-type Metadata struct {
+// Metadata variables injected at build time
+var (
 	GitCommit string
 	BuildDate string
 	URL       string
 	License   string
-}
-
-// These are set by -X flags at build time
-var (
-	gitCommit string
-	buildDate string
-	url       string
-	license   string
 )
 
-var BuildMetadata Metadata
-
-func init() {
-	BuildMetadata = Metadata{
-		GitCommit: gitCommit,
-		BuildDate: buildDate,
-		URL:       url,
-		License:   license,
-	}
+func PrintMetadata() {
+	fmt.Printf("Git Commit: %s\n", GitCommit)
+	fmt.Printf("Build Date: %s\n", BuildDate)
+	fmt.Printf("Releaser: %s\n", URL)
 }
 
-func (m Metadata) PrintMetadata() {
-	fmt.Printf("Git Commit: %s\n", m.GitCommit)
-	fmt.Printf("Build Date: %s\n", m.BuildDate)
-	fmt.Printf("Releaser: %s\n", m.URL)
-}
-
-func (m Metadata) PrintLicense() {
-	fmt.Println(m.License)
+func PrintLicense() {
+	fmt.Println(License)
 }
