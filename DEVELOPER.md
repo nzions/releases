@@ -160,9 +160,18 @@ This allows you to use the local releases module during development.
 Built binaries follow this pattern:
 
 ```
-binaries/<appname>/<os>-<arch>-v<version>
+binaries/<appname>/<appname>-<os>-<arch>-v<version>
+binaries/<appname>/<appname>-<os>-<arch>-latest
 ```
 
+Windows binaries include `.exe` extension.
+
+The `-latest` files are copies that always point to the most recent version for easy downloading.
+
 Examples:
-- `binaries/certmania/linux-amd64-v1.2.0`
-- `binaries/simplecrypt/darwin-arm64-v1.4.0`
+- `binaries/certmania/certmania-linux-amd64-v1.2.0` (versioned)
+- `binaries/certmania/certmania-linux-amd64-latest` (copy of latest)
+- `binaries/certmania/certmania-windows-amd64-v1.2.0.exe` (Windows)
+- `binaries/certmania/certmania-windows-amd64-latest.exe` (Windows latest)
+- `binaries/simplecrypt/simplecrypt-darwin-arm64-v1.4.0` (versioned)
+- `binaries/simplecrypt/simplecrypt-darwin-arm64-latest` (copy of latest)

@@ -93,7 +93,8 @@ for entry in "${BINARIES[@]}"; do
         output_os="$os"
         [ "$os" = "darwin" ] && output_os="macos"
 
-        target_name="$output_os-$arch-$version"
+        target_name="$binary_name-$output_os-$arch-$version"
+        [ "$os" = "windows" ] && target_name="${target_name}.exe"
         target_path="$dest_dir/$target_name"
 
         # Build with injected variables
@@ -103,6 +104,15 @@ for entry in "${BINARIES[@]}"; do
             -ldflags="$ldflags" \
             -o "$target_path" "./$rel_path" || continue
         chmod +x "$target_path"
+    done
+
+    # Create -latest copies for each platform
+    cd "$dest_dir"
+    for file in "$binary_name-"*-"$version"; do
+        [ -f "$file" ] || continue
+        latest_name="${file%-$version}-latest"
+        cp "$file" "$latest_name"
+        chmod +x "$latest_name"
     done
 
     RELEASED+=("$binary_name:$version")

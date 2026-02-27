@@ -88,22 +88,20 @@ binaries=$(curl -sSL "https://api.github.com/repos/${REPO}/contents/binaries" | 
 
 installed=()
 for binary in $binaries; do
-    # Find latest version for this platform
-    files=$(curl -sSL "https://api.github.com/repos/${REPO}/contents/binaries/${binary}" | grep '"name"' | cut -d'"' -f4)
-    latest=$(echo "$files" | grep "^${platform}-v" | sort -V | tail -1)
-
-    if [ -z "$latest" ]; then
-        continue
-    fi
-
-    version="${latest#${platform}-}"
+    # Try to fetch -latest version first
+    latest="${binary}-${platform}-latest"
+    [ "$os" = "windows" ] && latest="${latest}.exe"
     url="https://github.com/${REPO}/raw/master/binaries/${binary}/${latest}"
     dest="${INSTALL_DIR}/${binary}"
+    [ "$os" = "windows" ] && dest="${dest}.exe"
 
-    echo "  → ${binary} ${version}"
-    curl -sSL "$url" -o "$dest"
-    chmod +x "$dest"
-    installed+=("$binary")
+    echo "  → ${binary} (latest)"
+    if curl -sSLf "$url" -o "$dest" 2>/dev/null; then
+        chmod +x "$dest"
+        installed+=("$binary")
+    else
+        echo "    Warning: ${binary} not available for ${platform}"
+    fi
 done
 
 echo ""
