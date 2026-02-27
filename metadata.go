@@ -9,7 +9,24 @@ type Metadata struct {
 	License   string
 }
 
+// These are set by -X flags at build time
+var (
+	gitCommit string
+	buildDate string
+	url       string
+	license   string
+)
+
 var BuildMetadata Metadata
+
+func init() {
+	BuildMetadata = Metadata{
+		GitCommit: gitCommit,
+		BuildDate: buildDate,
+		URL:       url,
+		License:   license,
+	}
+}
 
 func (m Metadata) PrintMetadata() {
 	fmt.Printf("Git Commit: %s\n", m.GitCommit)
