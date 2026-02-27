@@ -1,65 +1,73 @@
 # Build Variables Reference
 
-The release script injects these variables into binaries at build time:
+The releases package provides metadata struct that's injected at build time.
+
+## Import in Your CLI
 
 ```go
-package main
-
-var (
-    Version     string // e.g., "v1.2.0"
-    GitCommit   string // e.g., "abc123d"
-    BuildDate   string // e.g., "2026-02-27T10:30:00Z"
-    ReleaserURL string // "https://github.com/nzions/releases"
-    License     string // License notice
-)
+import "github.com/nzions/releases"
 ```
 
-## Usage Example
+Your binary's version stays as a constant in your package:
+```go
+const Version = "1.2.0"
+```
+
+Release metadata is available as: `releases.BuildMetadata`
+
+## Example Implementation
 
 ```go
 package main
 
 import (
-    "flag"
-    "fmt"
-    "os"
+	"flag"
+	"fmt"
+
+	"github.com/nzions/coreutils/certmania/ca"  // or your package
+	"github.com/nzions/releases"
 )
 
-var (
-    // Injected at build time
-    Version     = "dev"
-    GitCommit   = "unknown"
-    BuildDate   = "unknown"
-    ReleaserURL = ""
-    License     = ""
-)
+const Version = "1.2.0"  // Your app version
 
 func main() {
-    showVersion := flag.Bool("version", false, "show version")
-    showLicense := flag.Bool("license", false, "show license")
-    flag.Parse()
+	version := flag.Bool("version", false, "show version")
+	help := flag.Bool("help", false, "show build details")
+	license := flag.Bool("license", false, "show license")
+	flag.Parse()
 
-    if *showVersion {
-        fmt.Printf("version %s (commit: %s, built: %s)\n", Version, GitCommit, BuildDate)
-        if ReleaserURL != "" {
-            fmt.Printf("releases: %s\n", ReleaserURL)
-        }
-        os.Exit(0)
-    }
+	if *version {
+		fmt.Println(Version)
+		return
+	}
 
-    if *showLicense {
-        fmt.Println(License)
-        os.Exit(0)
-    }
+	if *help {
+		fmt.Printf("Version: %s\n", Version)
+		releases.BuildMetadata.PrintMetadata()
+		fmt.Println("For license, see --license")
+		return
+	}
 
-    // Your main program logic
+	if *license {
+		releases.BuildMetadata.PrintLicense()
+		return
+	}
+
+	// Your app logic
 }
 ```
 
-## Variables Injected
+## Metadata Structure
 
-- `main.Version` - Version from binary's `--version` output
-- `main.GitCommit` - Short commit hash (7 chars) from source repo
-- `main.BuildDate` - RFC3339 UTC timestamp
-- `main.ReleaserURL` - URL to releases repository
-- `main.License` - Copyright and license notice
+```go
+type Metadata struct {
+	GitCommit string  // Short commit hash from source repo
+	BuildDate string  // RFC3339 UTC timestamp
+	URL       string  // URL to releases repository
+	License   string  // Full license text
+}
+
+// Methods available:
+// BuildMetadata.PrintMetadata()  // Prints git commit, build date, URL
+// BuildMetadata.PrintLicense()   // Prints license text
+```

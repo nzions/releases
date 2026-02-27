@@ -63,11 +63,10 @@ for entry in "${BINARIES[@]}"; do
     
     # Build ldflags
     ldflags="-s -w"
-    ldflags="$ldflags -X 'main.Version=$version'"
-    ldflags="$ldflags -X 'main.GitCommit=$git_commit'"
-    ldflags="$ldflags -X 'main.BuildDate=$build_date'"
-    ldflags="$ldflags -X 'main.ReleaserURL=$releaser_url'"
-    ldflags="$ldflags -X 'main.License=$license'"
+    ldflags="$ldflags -X 'github.com/nzions/releases.BuildMetadata.GitCommit=$git_commit'"
+    ldflags="$ldflags -X 'github.com/nzions/releases.BuildMetadata.BuildDate=$build_date'"
+    ldflags="$ldflags -X 'github.com/nzions/releases.BuildMetadata.URL=$releaser_url'"
+    ldflags="$ldflags -X 'github.com/nzions/releases.BuildMetadata.License=$license'"
     
     # Create output directory
     dest_dir="$RELEASES_REPO/binaries/$binary_name"
