@@ -36,6 +36,19 @@ All tools support these standard flags:
 <tool> --help
 ```
 
+## Verify Downloads
+
+Each binary includes a SHA256 checksum file:
+
+```bash
+# Download binary and checksum
+curl -LO https://github.com/nzions/releases/raw/master/binaries/certmania/certmania-linux-amd64-latest
+curl -LO https://github.com/nzions/releases/raw/master/binaries/certmania/certmania-linux-amd64-latest.sum
+
+# Verify checksum
+shasum -a 256 -c certmania-linux-amd64-latest.sum
+```
+
 ## Supported Platforms
 
 - Linux (amd64, arm64)

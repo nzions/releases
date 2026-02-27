@@ -104,6 +104,10 @@ for entry in "${BINARIES[@]}"; do
             -ldflags="$ldflags" \
             -o "$target_path" "./$rel_path" || continue
         chmod +x "$target_path"
+        
+        # Generate SHA256 checksum
+        cd "$dest_dir"
+        shasum -a 256 "$(basename "$target_path")" > "$(basename "$target_path").sum"
     done
 
     # Create -latest copies for each platform
@@ -113,6 +117,9 @@ for entry in "${BINARIES[@]}"; do
         latest_name="${file%-$version}-latest"
         cp "$file" "$latest_name"
         chmod +x "$latest_name"
+        
+        # Generate checksum for -latest
+        shasum -a 256 "$(basename "$latest_name")" > "${latest_name}.sum"
     done
 
     RELEASED+=("$binary_name:$version")

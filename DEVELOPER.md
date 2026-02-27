@@ -161,17 +161,21 @@ Built binaries follow this pattern:
 
 ```
 binaries/<appname>/<appname>-<os>-<arch>-v<version>
+binaries/<appname>/<appname>-<os>-<arch>-v<version>.sum
 binaries/<appname>/<appname>-<os>-<arch>-latest
+binaries/<appname>/<appname>-<os>-<arch>-latest.sum
 ```
 
-Windows binaries include `.exe` extension.
+Windows binaries include `.exe` extension. Each binary has a corresponding `.sum` file containing its SHA256 checksum.
 
 The `-latest` files are copies that always point to the most recent version for easy downloading.
 
 Examples:
-- `binaries/certmania/certmania-linux-amd64-v1.2.0` (versioned)
-- `binaries/certmania/certmania-linux-amd64-latest` (copy of latest)
+- `binaries/certmania/certmania-linux-amd64-v1.2.0` (versioned binary)
+- `binaries/certmania/certmania-linux-amd64-v1.2.0.sum` (SHA256 checksum)
+- `binaries/certmania/certmania-linux-amd64-latest` (latest binary)
+- `binaries/certmania/certmania-linux-amd64-latest.sum` (latest checksum)
 - `binaries/certmania/certmania-windows-amd64-v1.2.0.exe` (Windows)
-- `binaries/certmania/certmania-windows-amd64-latest.exe` (Windows latest)
+- `binaries/certmania/certmania-windows-amd64-v1.2.0.exe.sum` (Windows checksum)
 - `binaries/simplecrypt/simplecrypt-darwin-arm64-v1.4.0` (versioned)
-- `binaries/simplecrypt/simplecrypt-darwin-arm64-latest` (copy of latest)
+- `binaries/simplecrypt/simplecrypt-darwin-arm64-latest` (latest)
