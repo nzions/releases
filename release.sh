@@ -61,6 +61,14 @@ for entry in "${BINARIES[@]}"; do
     releaser_url="https://github.com/nzions/releases"
     license="Copyright (c) 2026 nzions. All rights reserved. Private and proprietary software. Use requires permission."
     
+    # Build ldflags
+    ldflags="-s -w"
+    ldflags="$ldflags -X 'main.Version=$version'"
+    ldflags="$ldflags -X 'main.GitCommit=$git_commit'"
+    ldflags="$ldflags -X 'main.BuildDate=$build_date'"
+    ldflags="$ldflags -X 'main.ReleaserURL=$releaser_url'"
+    ldflags="$ldflags -X 'main.License=$license'"
+    
     # Create output directory
     dest_dir="$RELEASES_REPO/binaries/$binary_name"
     mkdir -p "$dest_dir"
@@ -81,8 +89,8 @@ for entry in "${BINARIES[@]}"; do
         cd "$mod_dir"
         CGO_ENABLED=0 GOOS="$os" GOARCH="$arch" go build \
             -tags netgo \
-            -ldflags="-s -w -X main.Version=$version -X main.GitCommit=$git_commit -X main.BuildDate=$build_date -X main.ReleaserURL=$releaser_url -X main.License=$license" \
-            -o "$target_path" "./$rel_path" 2>/dev/null || continue
+            -ldflags="$ldflags" \
+            -o "$target_path" "./$rel_path" || continue
         chmod +x "$target_path"
     done
     
