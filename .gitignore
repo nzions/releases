@@ -1,5 +1,16 @@
+# Build temporary files
 .build-temp/
+
+# Editor temporary files
 *.swp
 *.swo
 *~
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Go files
+*.test
+*.out
+coverage.out

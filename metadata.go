@@ -1,3 +1,20 @@
+// Package releases provides build metadata injection for Go binaries.
+//
+// Usage:
+//
+//	import "github.com/nzions/releases"
+//
+//	func main() {
+//	    releases.Hijack(Version)  // Auto-handles --buildinfo and --license
+//	    // Your app logic
+//	}
+//
+// This adds two flags to your binary:
+//
+//	--buildinfo  Shows version, git commit, build date, releaser URL
+//	--license    Shows license text
+//
+// Variables GitCommit, BuildDate, URL, and License are injected at build time.
 package releases
 
 import (

@@ -1,19 +1,43 @@
 # Build Variables Reference
 
-The releases package provides metadata struct that's injected at build time.
+The `releases` package provides build metadata injection for Go binaries.
 
-## Import in Your CLI
+## Quick Start
+
+Add one line to your `main()`:
 
 ```go
 import "github.com/nzions/releases"
+
+func main() {
+    releases.Hijack(Version)  // Handles --buildinfo and --license
+
+    // Your app logic
+}
 ```
 
-Your binary's version stays as a constant in your package:
+This automatically adds:
+- `--buildinfo` - Shows version, git commit, build date, releaser URL
+- `--license` - Shows full license text
+
+## Available Variables
+
 ```go
-const Version = "1.2.0"
+var (
+    GitCommit string  // Injected at build time
+    BuildDate string  // Injected at build time
+    URL       string  // Injected at build time
+    License   string  // Injected at build time
+)
 ```
 
-Release metadata is available as: `releases.BuildMetadata`
+## Available Functions
+
+```go
+releases.Hijack(version string)  // Intercepts --buildinfo and --license
+releases.PrintMetadata()         // Prints git commit, build date, URL
+releases.PrintLicense()          // Prints license text
+```
 
 ## Example Implementation
 
@@ -21,53 +45,43 @@ Release metadata is available as: `releases.BuildMetadata`
 package main
 
 import (
-	"flag"
-	"fmt"
+    "flag"
+    "fmt"
 
-	"github.com/nzions/coreutils/certmania/ca"  // or your package
-	"github.com/nzions/releases"
+    "github.com/nzions/releases"
 )
 
-const Version = "1.2.0"  // Your app version
+const Version = "1.2.0"
 
 func main() {
-	version := flag.Bool("version", false, "show version")
-	help := flag.Bool("help", false, "show build details")
-	license := flag.Bool("license", false, "show license")
-	flag.Parse()
+    releases.Hijack(Version)  // Auto-handles --buildinfo and --license
 
-	if *version {
-		fmt.Println(Version)
-		return
-	}
+    version := flag.Bool("version", false, "show version")
+    flag.Parse()
 
-	if *help {
-		fmt.Printf("Version: %s\n", Version)
-		releases.BuildMetadata.PrintMetadata()
-		fmt.Println("For license, see --license")
-		return
-	}
+    if *version {
+        fmt.Println(Version)
+        return
+    }
 
-	if *license {
-		releases.BuildMetadata.PrintLicense()
-		return
-	}
-
-	// Your app logic
+    // Your app logic
 }
 ```
 
-## Metadata Structure
+## Supported Flags
 
-```go
-type Metadata struct {
-	GitCommit string  // Short commit hash from source repo
-	BuildDate string  // RFC3339 UTC timestamp
-	URL       string  // URL to releases repository
-	License   string  // Full license text
-}
+Your binary automatically supports:
+- `--version` - Plain version (you handle this)
+- `--buildinfo` - Version + build metadata (handled by Hijack)
+- `--license` - License text (handled by Hijack)
 
-// Methods available:
-// BuildMetadata.PrintMetadata()  // Prints git commit, build date, URL
-// BuildMetadata.PrintLicense()   // Prints license text
+## How It Works
+
+The release script injects these variables at build time:
+
+```bash
+-X 'github.com/nzions/releases.GitCommit=abc123'
+-X 'github.com/nzions/releases.BuildDate=2026-02-27T10:00:00Z'
+-X 'github.com/nzions/releases.URL=https://github.com/nzions/releases'
+-X 'github.com/nzions/releases.License=Copyright...'
 ```

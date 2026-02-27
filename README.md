@@ -1,6 +1,6 @@
 # releases
 
-Static Go binaries for various tools.
+Static Go binaries for private tools.
 
 ## Install
 
@@ -10,23 +10,37 @@ curl -sSL https://raw.githubusercontent.com/nzions/releases/master/get.sh | bash
 
 Auto-detects your OS/architecture and installs to `~/go/bin` or `/usr/local/bin`.
 
-## Tools
+## Available Tools
 
 - **certmania** - Certificate management utility
-- **simplecrypt** - Simple encryption/decryption tool
+- **simplecrypt** - Encrypted credential storage
+
+## Features
+
+All binaries include:
+- Static compilation (no external dependencies)
+- Stripped for minimal size
+- Build metadata injection (commit, date, license)
+- Consistent `--version`, `--buildinfo`, `--license` flags
 
 ---
 
 <details>
-<summary>For maintainers: Building releases</summary>
+<summary>For Maintainers: Release Process</summary>
 
-### Build New Releases
+### Building Releases
 
 ```bash
 bash release.sh
 ```
 
-Builds all binaries from `.binaries`, creates git tags, commits, and pushes.
+This script:
+1. Reads binary paths from `.binaries`
+2. Extracts version from `--version` output
+3. Builds for 5 platforms (linux/arm64, linux/amd64, darwin/arm64, darwin/amd64, windows/amd64)
+4. Injects build metadata
+5. Commits binaries and creates git tags
+6. Pushes to GitHub
 
 ### Configuration
 
@@ -37,21 +51,43 @@ Edit `.binaries` (format: `path:appname`):
 ~/code/coreutils/simplecrypt/cli:simplecrypt
 ```
 
-### Platforms
+### Build Settings
 
-linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
+Binaries are built with:
+- `CGO_ENABLED=0` - Pure Go, no C dependencies
+- `-tags netgo` - Pure Go network stack
+- `-ldflags="-s -w"` - Stripped symbols for smaller size
+- Build variable injection via `-X` flags
 
-Binaries are static (CGO_ENABLED=0, -tags netgo) and stripped (-ldflags="-s -w").
+### Integrating Build Metadata
 
-### Injected Build Variables
+Add to your CLI's `main()`:
 
-The following variables are automatically injected at build time:
-- `main.Version` - Binary version
-- `main.GitCommit` - Source commit hash
-- `main.BuildDate` - Build timestamp (RFC3339 UTC)
-- `main.ReleaserURL` - https://github.com/nzions/releases
-- `main.License` - License notice
+```go
+import "github.com/nzions/releases"
 
-See [BUILD_VARS.md](BUILD_VARS.md) for implementation example.
+func main() {
+    releases.Hijack(Version)  // Handles --buildinfo and --license
+    // Your app logic
+}
+```
+
+See [BUILD_VARS.md](BUILD_VARS.md) for full documentation.
+
+### Project Structure
+
+```
+.
+├── .binaries          # List of binaries to build
+├── .gitignore         # Ignores .build-temp
+├── BUILD_VARS.md      # Build variable documentation
+├── LICENSE            # Proprietary license
+├── README.md          # This file
+├── binaries/          # Built binaries (committed)
+├── get.sh             # Installation script
+├── go.mod             # Go module definition
+├── metadata.go        # Releases package with Hijack()
+└── release.sh         # Build and release script
+```
 
 </details>
