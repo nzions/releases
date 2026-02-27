@@ -5,7 +5,38 @@
 set -e
 
 REPO="nzions/releases"
-INSTALL_DIR="${HOME}/bin"
+
+# Find best install directory from PATH
+find_install_dir() {
+    # Preferred locations in order
+    local candidates=(
+        "$HOME/go/bin"
+        "/usr/local/bin"
+        "$HOME/bin"
+        "$HOME/.local/bin"
+    )
+    
+    for dir in "${candidates[@]}"; do
+        # Check if directory is in PATH
+        if echo "$PATH" | tr ':' '\n' | grep -q "^${dir}$"; then
+            echo "$dir"
+            return
+        fi
+    done
+    
+    # Fallback: use first writable candidate
+    for dir in "${candidates[@]}"; do
+        if [ -w "$dir" ] || [ -w "$(dirname "$dir")" ]; then
+            echo "$dir"
+            return
+        fi
+    done
+    
+    # Last resort
+    echo "$HOME/bin"
+}
+
+INSTALL_DIR=$(find_install_dir)
 
 # Detect OS and arch
 os=$(uname -s | tr '[:upper:]' '[:lower:]')
