@@ -66,6 +66,7 @@ mkdir -p "$INSTALL_DIR"
 # Get list of binaries and install latest version of each
 binaries=$(curl -sSL "https://api.github.com/repos/${REPO}/contents/binaries" | grep '"name"' | cut -d'"' -f4)
 
+installed=()
 for binary in $binaries; do
     # Find latest version for this platform
     files=$(curl -sSL "https://api.github.com/repos/${REPO}/contents/binaries/${binary}" | grep '"name"' | cut -d'"' -f4)
@@ -82,12 +83,32 @@ for binary in $binaries; do
     echo "  → ${binary} ${version}"
     curl -sSL "$url" -o "$dest"
     chmod +x "$dest"
+    installed+=("$binary")
 done
 
 echo ""
-echo "✓ Done!"
-if ! echo "$PATH" | grep -q "${INSTALL_DIR}"; then
+echo "✓ Installed to ${INSTALL_DIR}:"
+for binary in "${installed[@]}"; do
+    echo "  - $binary"
+done
+
+if echo "$PATH" | tr ':' '\n' | grep -q "^${INSTALL_DIR}$"; then
     echo ""
-    echo "Add to your PATH:"
+    echo "Run binaries directly:"
+    for binary in "${installed[@]}"; do
+        echo "  $binary --version"
+    done
+else
+    echo ""
+    echo "Not in PATH. Run with:"
+    for binary in "${installed[@]}"; do
+        if [ "$INSTALL_DIR" = "./" ]; then
+            echo "  ./$binary --version"
+        else
+            echo "  ${INSTALL_DIR}/$binary --version"
+        fi
+    done
+    echo ""
+    echo "Or add to PATH:"
     echo "  export PATH=\"${INSTALL_DIR}:\$PATH\""
 fi
