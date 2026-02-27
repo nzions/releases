@@ -60,6 +60,10 @@ for entry in "${BINARIES[@]}"; do
 
     # Extract version
     rel_path="${binary_path#$mod_dir/}"
+    # If rel_path is still the absolute path, it means binary_path == mod_dir
+    if [ "$rel_path" = "$binary_path" ]; then
+        rel_path="."
+    fi
     version=$(cd "$mod_dir" && go run "./$rel_path" --version 2>/dev/null | head -1)
     version=$(echo "$version" | grep -oE 'v?[0-9]+\.[0-9]+\.[0-9]+' | head -1)
     [ -n "$version" ] || error "Could not extract version from: $binary_path"
