@@ -12,12 +12,14 @@ Builds all binaries listed in `.binaries` for all platforms, creates git tags, c
 
 ## Configuration
 
-Edit `.binaries` (one path per line):
+Edit `.binaries` (one per line, format: `path` or `path:appname`):
 
 ```
-~/code/coreutils/certmania/cli
-~/code/coreutils/simplecrypt/cli
+~/code/coreutils/certmania/cli:certmania
+~/code/coreutils/simplecrypt/cli:simplecrypt
 ```
+
+If no appname specified, uses the directory name.
 
 ## Requirements
 

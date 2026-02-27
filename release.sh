@@ -25,12 +25,17 @@ declare -a RELEASED
 
 # Build each binary
 log "Building binaries..."
-for binary_path in "${BINARIES[@]}"; do
+for entry in "${BINARIES[@]}"; do
+    # Parse path:appname format
+    binary_path="${entry%:*}"
+    binary_name="${entry#*:}"
+    # If no appname specified, use basename of path
+    [ "$binary_name" = "$entry" ] && binary_name=$(basename "$binary_path")
+    
     # Expand ~ and validate
     binary_path="${binary_path/#\~/$HOME}"
     [ -d "$binary_path" ] || error "Path not found: $binary_path"
     
-    binary_name=$(basename "$binary_path")
     log ""
     log "  → $binary_name"
     
