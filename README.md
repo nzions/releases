@@ -58,4 +58,6 @@ shasum -a 256 -c certmania-linux-amd64-latest.sum
 
 ---
 
+**Built by [@nzions](https://github.com/nzions) and AI** (mostly AI)
+
 **For Developers:** See [DEVELOPER.md](DEVELOPER.md) for build and integration documentation.
