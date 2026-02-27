@@ -16,6 +16,7 @@ The installer will:
 
 ## Available Tools
 
+- **buildr** - Build, containerize, and push Go binaries to OCI registries
 - **certmania** - Certificate management utility
 - **simplecrypt** - Encrypted credential storage
 
