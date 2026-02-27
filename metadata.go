@@ -1,6 +1,9 @@
 package releases
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 // Metadata variables injected at build time
 var (
@@ -18,4 +21,21 @@ func PrintMetadata() {
 
 func PrintLicense() {
 	fmt.Println(License)
+}
+
+// Hijack checks for --buildinfo and --license flags in os.Args
+// If found, prints the information and exits. Otherwise returns.
+func Hijack(version string) {
+	for _, arg := range os.Args[1:] {
+		if arg == "--buildinfo" {
+			fmt.Printf("Version: %s\n", version)
+			PrintMetadata()
+			fmt.Println("For license, see --license")
+			os.Exit(0)
+		}
+		if arg == "--license" {
+			PrintLicense()
+			os.Exit(0)
+		}
+	}
 }
