@@ -96,7 +96,7 @@ if [ ${#RELEASED[@]} -gt 0 ]; then
     
     # Create tags and push
     for rel in "${RELEASED[@]}"; do
-        git tag "${rel/:/-}"
+        git tag -f "${rel/:/-}"
     done
     
     git push --follow-tags
