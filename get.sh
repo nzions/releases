@@ -14,6 +14,7 @@
 #     3. Falls back to current directory
 #   - Interactive binary selection menu
 #   - Fetches latest versions from GitHub API
+#   - Verifies SHA256 checksums for security
 #   - Verifies downloads
 #
 # SUPPORTED PLATFORMS:
@@ -87,28 +88,71 @@ mkdir -p "$INSTALL_DIR"
 binaries=$(curl -sSL "https://api.github.com/repos/${REPO}/contents/binaries" | grep '"name"' | cut -d'"' -f4)
 
 installed=()
+failed=()
 for binary in $binaries; do
     # Try to fetch -latest version first
     latest="${binary}-${platform}-latest"
     [ "$os" = "windows" ] && latest="${latest}.exe"
     url="https://github.com/${REPO}/raw/master/binaries/${binary}/${latest}"
+    checksum_url="${url}.sum"
     dest="${INSTALL_DIR}/${binary}"
     [ "$os" = "windows" ] && dest="${dest}.exe"
 
     echo "  → ${binary} (latest)"
-    if curl -sSLf "$url" -o "$dest" 2>/dev/null; then
-        chmod +x "$dest"
-        installed+=("$binary")
+    
+    # Download binary to temp location
+    temp_binary=$(mktemp)
+    temp_checksum=$(mktemp)
+    
+    if curl -sSLf "$url" -o "$temp_binary" 2>/dev/null; then
+        # Download checksum
+        if curl -sSLf "$checksum_url" -o "$temp_checksum" 2>/dev/null; then
+            # Verify checksum
+            cd "$(dirname "$temp_binary")"
+            if echo "$(cat "$temp_checksum" | awk '{print $1}')  $(basename "$temp_binary")" | shasum -a 256 -c >/dev/null 2>&1; then
+                mv "$temp_binary" "$dest"
+                chmod +x "$dest"
+                installed+=("$binary")
+                echo "    ✓ Verified and installed"
+            else
+                echo "    ✗ Checksum verification failed"
+                failed+=("$binary")
+                rm -f "$temp_binary"
+            fi
+            rm -f "$temp_checksum"
+        else
+            echo "    Warning: Checksum not available, installing anyway"
+            mv "$temp_binary" "$dest"
+            chmod +x "$dest"
+            installed+=("$binary")
+        fi
     else
         echo "    Warning: ${binary} not available for ${platform}"
+        failed+=("$binary")
+        rm -f "$temp_binary"
     fi
 done
 
 echo ""
-echo "✓ Installed to ${INSTALL_DIR}:"
-for binary in "${installed[@]}"; do
-    echo "  - $binary"
-done
+if [ ${#installed[@]} -gt 0 ]; then
+    echo "✓ Installed to ${INSTALL_DIR}:"
+    for binary in "${installed[@]}"; do
+        echo "  - $binary"
+    done
+fi
+
+if [ ${#failed[@]} -gt 0 ]; then
+    echo ""
+    echo "✗ Failed to install:"
+    for binary in "${failed[@]}"; do
+        echo "  - $binary"
+    done
+fi
+
+if [ ${#installed[@]} -eq 0 ]; then
+    echo "No binaries were installed."
+    exit 1
+fi
 
 if echo "$PATH" | tr ':' '\n' | grep -q "^${INSTALL_DIR}$"; then
     echo ""

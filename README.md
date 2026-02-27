@@ -10,6 +10,7 @@ curl -sSL https://raw.githubusercontent.com/nzions/releases/master/get.sh | bash
 
 The installer will:
 - Auto-detect your OS and architecture
+- Verify SHA256 checksums for security
 - Install to `~/go/bin` (if in your PATH) or `/usr/local/bin`
 - Prompt you to select which tools to install
 
