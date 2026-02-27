@@ -2,7 +2,15 @@
 
 Build and release binaries from source repos using `go build`.
 
-## Quick Start
+## Install Binaries
+
+```bash
+curl -sSL https://raw.githubusercontent.com/nzions/releases/master/get.sh | bash
+```
+
+This auto-detects your OS/architecture and installs the latest versions to `~/bin`.
+
+## Build New Releases
 
 ```bash
 ./release.sh
