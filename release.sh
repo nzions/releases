@@ -72,7 +72,7 @@ for binary_path in "${BINARIES[@]}"; do
         
         # Build
         cd "$mod_dir"
-        GOOS="$os" GOARCH="$arch" go build -o "$target_path" "./$rel_path" 2>/dev/null || continue
+        CGO_ENABLED=0 GOOS="$os" GOARCH="$arch" go build -tags netgo -ldflags="-s -w" -o "$target_path" "./$rel_path" 2>/dev/null || continue
         chmod +x "$target_path"
     done
     
