@@ -27,6 +27,23 @@ Edit `.binaries` (format: `path:appname`):
 ~/code/coreutils/simplecrypt/cli:simplecrypt
 ```
 
+### Version Output Requirement
+
+**Important**: The `--version` flag **must output only the version number** in `n.n.n` format (e.g., `1.0.2`), with no additional text or labels.
+
+The release script parses this output to extract the version using regex: `v?[0-9]+\.[0-9]+\.[0-9]+`
+
+❌ **Incorrect:**
+```
+buildr version 1.0.2
+embedded dstart version 1.0.3
+```
+
+✅ **Correct:**
+```
+1.0.2
+```
+
 ### Build Settings
 
 Binaries are built with:
