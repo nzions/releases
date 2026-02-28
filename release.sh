@@ -71,6 +71,21 @@ for entry in "${BINARIES[@]}"; do
 
     log "    version: $version"
 
+    # Skip if all platform binaries for this version already exist
+    dest_dir="$RELEASES_REPO/binaries/$binary_name"
+    all_exist=true
+    for platform in "${PLATFORMS[@]}"; do
+        os="${platform%/*}"; arch="${platform#*/}"
+        output_os="$os"; [ "$os" = "darwin" ] && output_os="macos"
+        target_name="$binary_name-$output_os-$arch-$version"
+        [ "$os" = "windows" ] && target_name="${target_name}.exe"
+        [ -f "$dest_dir/$target_name" ] || { all_exist=false; break; }
+    done
+    if $all_exist; then
+        log "    already exists, skipping"
+        continue
+    fi
+
     # Get git commit hash from source repo
     git_commit=$(cd "$mod_dir" && git rev-parse --short HEAD 2>/dev/null || echo "unknown")
     build_date=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
@@ -85,7 +100,6 @@ for entry in "${BINARIES[@]}"; do
     ldflags="$ldflags -X 'github.com/nzions/releases.License=$license'"
 
     # Create output directory
-    dest_dir="$RELEASES_REPO/binaries/$binary_name"
     mkdir -p "$dest_dir"
 
     # Build for each platform
@@ -151,7 +165,7 @@ if [ ${#RELEASED[@]} -gt 0 ]; then
     done
 
     git push
-    git push --tags
+    git push --tags --force
 
     log "✓ Done: $msg"
 fi
